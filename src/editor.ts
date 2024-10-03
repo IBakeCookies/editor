@@ -14,23 +14,21 @@ export class Editor {
     }
 
     insert(fromPosition: number, input: string): void {
-        this._insert(fromPosition, input);
+        this._content.insert(fromPosition, input);
 
         const toPosition = fromPosition + input.length;
 
         this._history.addAction({
-            undo: () => this._delete(fromPosition, toPosition),
+            undo: () => this._content.remove(fromPosition, toPosition),
             redo: () => this.insert(toPosition, input),
         });
     }
 
     delete(fromPosition: number, toPosition: number): string {
-        const deleted = this._delete(fromPosition, toPosition);
-
-        console.log('deleted', deleted);
+        const deleted = this._content.remove(fromPosition, toPosition);
 
         this._history.addAction({
-            undo: () => this._insert(fromPosition, deleted),
+            undo: () => this._content.insert(fromPosition, deleted),
             redo: () => this.delete(fromPosition, toPosition),
         });
 
@@ -43,13 +41,5 @@ export class Editor {
 
     redo(): void {
         this._history.redo();
-    }
-
-    private _delete(fromPosition: number, toPosition: number): string {
-        return this._content.remove(fromPosition, toPosition);
-    }
-
-    private _insert(position: number, inputString: string): void {
-        this._content.insert(position, inputString);
     }
 }
